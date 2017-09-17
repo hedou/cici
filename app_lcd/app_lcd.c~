@@ -1,0 +1,258 @@
+/*
+;************************************************************************************************************
+;*					��Ƽ��˾
+;*                                     	     �        
+;*
+;*                            	     http://www.techshine.com
+;*
+;*--------------------------------------------- ��Ϣ ---------------------------------------------------- 
+;*
+;* ���: app_lcd.c	
+;* �� : �ļΪS3C2410Ӳƽ̨�LCD����
+;* �� : 
+;*-------------------------------------------- ��汾�Ϣ -------------------------------------------------
+;* ����: ARMС�
+;* ����: 2004/09/09
+;* 汾�� : V1.0.1
+;*-------------------------------------------- �ʷ汾�Ϣ -------------------------------------------------
+;* ��� : ARMС�
+;* �� : 2004/09/09
+;* 汾�� : v1.0.0
+;*-----------------------------------------------------------------------------------------------------------
+;*-----------------------------------------------------------------------------------------------------------
+;************************************************************************************************************
+;*/
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/ioctl.h>
+#include <unistd.h>
+
+int main(void)
+{
+	int fd;
+	int rt;
+	int cmd;
+	int i,j,k,flagt,flagb,flagl,flagr,size;
+	int i9,j9,k9,flagt9,flagb9,flagl9,flagr9,size9;
+        char enter_c;
+        unsigned long arg_G,arg_B,arg_R,arg_Y,arg_W,arg_K,arg_CY;
+
+	struct arg 
+	{
+		unsigned long a;
+		unsigned long b;
+		unsigned long c;
+		unsigned long d;
+	};
+       struct arg arg1 = {0,120,639,0}; 
+       struct arg arg2 = {140,0,479,0};
+       struct arg arg3 = {200,200,100,0};
+       struct arg arg4 = {0,0,639,479};
+       struct arg arg5 = {240,100,60,0};
+       struct arg arg6 = {0,0,639,479};
+       struct arg arg7 = {100,100,500,400};
+	struct arg arg8,arg9;	
+
+       arg_G = 0x00FF00;
+       arg_R = 0xFF0000;
+       arg_B = 0x0000FF;
+       arg_Y = 0xF0F000;
+       arg_W = 0xFFFFFF;
+       arg_K = 0x000000;
+       arg_CY = 0x808080;
+	
+	if ((fd = open("/dev/S3C2410LCD", 0)) < 0) 
+	{
+		printf("cannot open /dev/S3C2410LCD\n");
+		exit(0);
+	};
+	
+       do{
+		cmd = getchar();
+	 
+		switch (cmd)
+		{
+			case 49:
+	
+                                enter_c = getchar();
+                                rt = ioctl(fd, 0,arg_R);   // set RED
+                                cmd = 0;
+				break;
+
+			case 50:
+                                enter_c = getchar();
+				rt = ioctl(fd, 0,arg_G);   //  set GREEN
+				break;
+		
+	                case 51:
+                                enter_c = getchar();
+				rt = ioctl(fd, 0,arg_B);   // set BLUE
+			        cmd = 0;
+			        break;
+		
+	                case 52:
+                                enter_c = getchar();
+				rt = ioctl(fd, 0,arg_Y); // set YELLOW
+			
+				cmd = 0;
+				break;
+		
+	                case 53:
+                                enter_c = getchar();
+				rt = ioctl(fd, 0,arg_W); // set WHITE
+				cmd = 0;
+				break;
+		
+	                case 54:
+                                enter_c = getchar();
+				rt = ioctl(fd, 0,arg_K); // set BLACK
+				cmd = 0;
+				break;
+             	   
+                        case 55:
+                                enter_c = getchar();
+				rt = ioctl(fd, 0,arg_CY); // set CYNE
+				cmd = 0;
+				break;
+			
+                        case 'a':
+                                enter_c = getchar();
+				rt = ioctl(fd, 1,(unsigned long )&arg1); // draw h_line
+				cmd = 0;
+				break;
+			case 'b':
+                                enter_c = getchar();
+				rt = ioctl(fd, 2,(unsigned long )&arg2); // draw v_line
+				cmd = 0;
+				break;
+			case 'c':
+                                enter_c = getchar();
+				rt = ioctl(fd, 3,(unsigned long )&arg3); // draw circle
+				cmd = 0;
+				break;
+			case 'd':
+                                enter_c = getchar();
+				rt = ioctl(fd, 4,(unsigned long )&arg4); // draw rect
+				cmd = 0;
+				break;
+			case 'e':
+                                enter_c = getchar();
+				rt = ioctl(fd, 5,(unsigned long )&arg5); // draw fillcircle
+				cmd = 0;
+				break;
+			case 'f':
+                                enter_c = getchar();
+				rt = ioctl(fd, 6,(unsigned long )&arg6); // clear screen
+                                cmd = 0;
+				break;
+			case 'g':
+                                enter_c = getchar();
+				rt = ioctl(fd, 7,(unsigned long )&arg7); // draw rect
+                                cmd = 0;
+				break;
+			default:
+                                enter_c = getchar();
+/*				for(i=1;i<500;i+=10)
+				{
+					arg8.a=i;
+					arg8.b=i;
+					arg8.c=i+30;
+					arg8.d=i+30;
+					//rt = ioctl(fd, 0,arg_B);
+					rt = ioctl(fd, 7,(unsigned long )&arg8); // draw rect
+					for(j=0;j<10000000;j++);	
+				}
+                                cmd = 0;
+*/
+				size=40;
+				flagt=-1;
+				flagl=-1;
+				flagb=1;
+				flagr=1;
+
+				size9=40;
+				flagt9=-1;
+				flagl9=-1;
+				flagb9=1;
+				flagr9=1;
+				for(i=20,j=20,i9=20,j9=20;;)
+				{
+					arg8.a=i-size/2;
+					arg8.b=j-size/2;
+					arg8.c=i+size/2;
+					arg8.d=j+size/2;
+					rt = ioctl(fd, 7,(unsigned long )&arg8); // draw rect
+					for(k=0;k<500000;k++);
+					if(j+20>459)//bottom
+					{
+						flagb=-1;
+						flagt=1;
+						j=459;
+					}
+					if(j-20<0)//top
+					{
+						flagt=-1;
+						flagb=1;
+						j=20;
+					}
+					if(i+20>639)//right
+					{
+						flagr=-1;
+						flagl=1;
+						i=619;
+					}
+					if(i-20<0)//left
+					{
+						flagl=-1;
+						flagr=1;
+						i=20;
+					}
+					//top
+					if(flagt==-1){j=j+25;flagb==1;printf("j:%d\n",j);}
+					if(flagb==-1){j=j-25;flagt==1;printf("j:%d\n",j);}
+					if(flagr==-1){i=i-20;flagl==1;printf("i:%d\n",i);}
+					if(flagl==-1){i=i+20;flagr==1;printf("i:%d\n",i);}
+/*2*/
+					arg9.a=i9-size9/2;
+					arg9.b=j9-size9/2;
+					arg9.c=i9+size9/2;
+					arg9.d=j9+size9/2;
+					rt = ioctl(fd, 7,(unsigned long )&arg9); // draw rect
+					for(k9=0;k9<500000;k9++);
+					if(j9+20>459)//bottom
+					{
+						flagb9=-1;
+						flagt9=1;
+						j9=459;
+					}
+					if(j9-20<0)//top
+					{
+						flagt9=-1;
+						flagb9=1;
+						j9=20;
+					}
+					if(i9+20>639)//right
+					{
+						flagr9=-1;
+						flagl9=1;
+						i9=619;
+					}
+					if(i9-20<0)//left
+					{
+						flagl9=-1;
+						flagr9=1;
+						i9=20;
+					}
+					//top
+					if(flagt9==-1){j9=j9+20;flagb9==1;}
+					if(flagb9==-1){j9=j9-20;flagt9==1;}
+					if(flagr9==-1){i9=i9-20;flagl9==1;}
+					if(flagl9==-1){i9=i9+20;flagr9==1;}
+				}
+  
+			    break;
+		}
+	}while(cmd != 'q');                                  // "q" is quit command
+	close(fd);
+        return 0;
+}
